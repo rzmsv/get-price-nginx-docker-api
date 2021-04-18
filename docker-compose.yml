@@ -1,0 +1,60 @@
+version: '3.5'
+services:
+
+  proxy:
+    image: nginx
+    container_name: reza-trade-proxy
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+    networks:
+      - reza
+
+  frontend:
+    build:
+      context: ./trade-ui
+    container_name: reza-trade-frontend
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./trade-ui:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - reza
+
+  backend:
+    build:
+      context: ./trade-crud
+    container_name: reza-trade-backend
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./trade-crud:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - reza
+  
+
+  mongo:
+    image: mongo:4.4.3-bionic
+    container_name: reza-mongo
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./mongo/data:/data/db
+    networks:
+      - reza
+
+  # swagger:
+  #   image: swaggerapi/swagger-ui
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - ./backend/swagger/reza.yml:/reza.yml
+  #   environment:
+  #     SWAGGER_JSON: /reza.yml
+  #     BASE_URL: /backend/docs
+  #     PORT: 80
+  #   networks:
+  #     - reza
+
+networks:
+  reza:
